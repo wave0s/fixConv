@@ -3,9 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notation Converter</title>
+    <title>Calculator</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script/script.js"></script>
 </head>
 <body>
-    <h2>Henlo</h2>
+    <h1>Calculator</h1>
+    <br>
+    <div class="container">
+        <div class="input">
+            
+            <div id="display" style="background-color: white; color: black; padding: 10px; margin-bottom: 10px; border-radius: 5px; min-height: 40px; font-family: Arial; font-size: 18px;">
+                <div id="currentExpression" style="margin-bottom: 5px;">Enter expression...</div>
+                <div id="postfixResult" style="font-size: 14px; color: #666;"></div>
+            </div>
+            
+            <div class="operators">
+               
+                <button type="button" id="plus">+</button>
+                <button type="button" id="minus">-</button>
+                <button type="button" id="multiply">*</button>
+                <button type="button" id="divide">/</button>
+                <button type="button" id="power">^</button><br>
+            </div>
+            <div class="numbers">
+                <button type="button" id="1">1</button>
+                <button type="button" id="2">2</button>
+                <button type="button" id="3">3</button><br>
+                <button type="button" id="4">4</button>
+                <button type="button" id="5">5</button>
+                <button type="button" id="6">6</button><br>
+                <button type="button" id="7">7</button>
+                <button type="button" id="8">8</button>
+                <button type="button" id="9">9</button><br>
+           
+                <button type="button" id="openParen">(</button>
+                <button type="button" id="0">0</button>
+                <button type="button" id="closeParen">)</button>
+            </div>
+            
+           
+            <div style="margin-top: 10px;">
+                <button type="button" id="convert" style="width: 100px; height: 40px; font-size: 16px; margin: 5px;">Convert</button>
+                <button type="button" id="clear" style="width: 100px; height: 40px; font-size: 16px; margin: 5px;">Clear</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

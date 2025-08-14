@@ -1,0 +1,44 @@
+body {
+  margin: 0px;
+  text-align: center;
+}
+.input button {
+  width: 55px;
+  height: 55px;
+  padding: 0;
+  margin: 5px;
+  font-size: 30px;
+}
+.container {
+  background-color: black;
+  border-radius: 10px;
+  width: fit-content;
+  padding: 20px;
+  margin-left: 500px;
+  box-shadow: 10px 10px 10px rgb(207, 207, 207);
+}
+.input {
+  text-align: center;
+}
+h1 {
+  font-size: 80px;
+  font-family: Georgia;
+}
+button {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: Arial;
+  border: 2px solid white;
+}
+button:hover {
+  background-color: white;
+  color: black;
+}
+.operators button {
+  width: 45px;
+  height: 45px;
+  font-size: 20px;
+  padding: 0;
+}
