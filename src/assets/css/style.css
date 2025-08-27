@@ -60,9 +60,14 @@ button:hover{
     color: white;
 }
 #Clear {
-    width: 250px; 
+    width: 173px; 
     height: 75px; 
     font-size: 30px; 
+}
+#toggleSign {
+  width: 75px;
+  height: 75px;
+  font-size: 20px;
 }
 .rightcontainer button{
     margin-top: 10px;
