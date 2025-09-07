@@ -167,11 +167,23 @@ $(document).ready(() => {
 
     $("#inputtext").val(currentExpression)
   }
-
-  function addChar(char) {
-    if (isOperator(char) && char == lastaddCharacter) {
-      return
+function addChar(char) {
+    if (currentExpression === "" && isOperator(char) && char !== "-") {
+      return 
     }
+
+    if (isOperator(char)) {
+      
+      if (currentExpression.length > 0 && isOperator(currentExpression[currentExpression.length - 1])) {
+        if (char === lastaddCharacter) {
+
+          return
+        } else {
+          currentExpression = currentExpression.slice(0, -1) 
+        }
+      }
+    }
+
     currentExpression += char
     lastaddCharacter = char
     updateDisplay()

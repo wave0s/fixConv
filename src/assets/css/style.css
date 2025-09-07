@@ -2,11 +2,12 @@
 body{
     margin: 0px;
     text-align: center;
-    height: 1000px;
-    background: 
-        url("images/1.png") no-repeat center 90%,
-        rgba(93, 95, 88, 0.997);
+    height: 100vh;
     background-size: 110% auto, cover;
+    background-image: url("../bg.png");
+    background-repeat: no-repeat;       
+    background-size: cover; 
+   
 }
 .main {
     display: flex;
@@ -21,7 +22,7 @@ body{
     padding: 5px;
     text-align: left;
 }
-.header-pane h1{ /*make logo*/
+.header-pane h1{ 
     text-align: center;
     font-size: 20px;
     font-family: Georgia;
@@ -68,6 +69,9 @@ button:hover{
   width: 75px;
   height: 75px;
   font-size: 20px;
+}
+.rightcontainer {
+    margin-left: -125px;
 }
 .rightcontainer button{
     margin-top: 10px;
