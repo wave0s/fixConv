@@ -1,286 +1,442 @@
 const $ = window.$
-$(document).ready(() => {
-  let currentExpression = ""
-  let lastaddCharacter = ""
+        $(document).ready(() => {
+            let currentExpression = ""
+            let lastaddCharacter = ""
 
-  /// checks if the elem in user's expressions is valid
-  function isAlphanumeric(character) {
-    if (character >= "0" && character <= "9") {
-      return true
-    }
-    if (character >= "A" && character <= "Z") {
-      return true
-    }
-    if (character >= "a" && character <= "z") {
-      return true
-    }
-    return false
-  }
+            function isAlphanumeric(character) {
+                if (character >= "0" && character <= "9") {
+                    return true
+                }
+                if (character >= "A" && character <= "Z") {
+                    return true
+                }
+                if (character >= "a" && character <= "z") {
+                    return true
+                }
+                return false
+            }
 
-  function isDigit(character) {
-    return character >= "0" && character <= "9"
-  }
+            function isDigit(character) {
+                return character >= "0" && character <= "9"
+            }
 
-  function isOperator(character) {
-    if (character === "+") return true
-    if (character === "-") return true
-    if (character === "*") return true
-    if (character === "/") return true
-    if (character === "^") return true
-    return false
-  }
-  
-  function toggleSign() {
-    if (currentExpression === "") {
-      return 
-    }
+            function isOperator(character) {
+                if (character === "+") return true
+                if (character === "-") return true
+                if (character === "*") return true
+                if (character === "/") return true
+                if (character === "^") return true
+                return false
+            }
+            
+            function toggleSign() {
+                if (currentExpression === "") {
+                    return 
+                }
 
-    let lastNumberStart = -1
-    const lastNumberEnd = currentExpression.length - 1
+                let lastNumberStart = -1
+                const lastNumberEnd = currentExpression.length - 1
 
-    if (!isDigit(currentExpression[lastNumberEnd])) {
-      return 
-    }
+                if (!isDigit(currentExpression[lastNumberEnd])) {
+                    return 
+                }
 
-    for (let i = lastNumberEnd; i >= 0; i--) {
-      if (isDigit(currentExpression[i])) {
-        lastNumberStart = i
-      } else {
-        break
-      }
-    }
+                for (let i = lastNumberEnd; i >= 0; i--) {
+                    if (isDigit(currentExpression[i])) {
+                        lastNumberStart = i
+                    } else {
+                        break
+                    }
+                }
 
-    if (lastNumberStart === -1) {
-      return 
-    }
+                if (lastNumberStart === -1) {
+                    return 
+                }
 
-    let numberStr = ""
-    for (let i = lastNumberStart; i <= lastNumberEnd; i++) {
-      numberStr += currentExpression[i]
-    }
+                let numberStr = ""
+                for (let i = lastNumberStart; i <= lastNumberEnd; i++) {
+                    numberStr += currentExpression[i]
+                }
 
-    let hasNegativeSign = false
-    if (lastNumberStart > 0 && currentExpression[lastNumberStart - 1] === "-") {
-   
-      if (
-        lastNumberStart === 1 ||
-        isOperator(currentExpression[lastNumberStart - 2]) ||
-        currentExpression[lastNumberStart - 2] === "("
-      ) {
-        hasNegativeSign = true
-        lastNumberStart-- 
-      }
-    }
+                let hasNegativeSign = false
+                if (lastNumberStart > 0 && currentExpression[lastNumberStart - 1] === "-") {
+                    if (
+                        lastNumberStart === 1 ||
+                        isOperator(currentExpression[lastNumberStart - 2]) ||
+                        currentExpression[lastNumberStart - 2] === "("
+                    ) {
+                        hasNegativeSign = true
+                        lastNumberStart-- 
+                    }
+                }
 
-    let newExpression = ""
+                let newExpression = ""
 
-    for (let i = 0; i < lastNumberStart; i++) {
-      newExpression += currentExpression[i]
-    }
+                for (let i = 0; i < lastNumberStart; i++) {
+                    newExpression += currentExpression[i]
+                }
 
-    // Add the toggled number
-    if (hasNegativeSign) {
-      // Remove the negative sign (make positive)
-      for (let i = lastNumberStart + 1; i <= lastNumberEnd; i++) {
-        newExpression += currentExpression[i]
-      }
-    } else {
-      // Add negative sign (make negative)
-      newExpression += "-" + numberStr
-    }
+                if (hasNegativeSign) {
+                    for (let i = lastNumberStart + 1; i <= lastNumberEnd; i++) {
+                        newExpression += currentExpression[i]
+                    }
+                } else {
+                    newExpression += "-" + numberStr
+                }
 
-    currentExpression = newExpression
-    updateDisplay()
-  }
+                currentExpression = newExpression
+                updateDisplay()
+            }
 
-  //order of operations or prio list
-  function prec(op) {
-    if (op === "^") return 3
-    if (op === "*" || op === "/") return 2
-    if (op === "+" || op === "-") return 1
-    return -1
-  }
-  
-  function infixToPostfix(infixExpression) {
+            function prec(op) {
+                if (op === "^") return 3
+                if (op === "*" || op === "/") return 2
+                if (op === "+" || op === "-") return 1
+                return -1
+            }
+            
+            function infixToPostfix(infixExpression) {
+    // First process negative expressions
+             const processedExpression = handleNegativeExpressions(infixExpression);
     
-    let operatorStack = ""
-    let stackSize = 0
-    let resultExpression = ""
+  
+                let operatorStack = ""
+                let stackSize = 0
+                let resultExpression = ""
+
+                function stackPush(item) {
+                    operatorStack += item
+                    stackSize++
+                }
+
+                function stackPop() {
+                    if (stackSize === 0) return ""
+                    const lastItem = operatorStack[stackSize - 1]
+                    operatorStack = operatorStack.substring(0, stackSize - 1)
+                    stackSize--
+                    return lastItem
+                }
+
+                function stackTop() {
+                    if (stackSize === 0) return ""
+                    return operatorStack[stackSize - 1]
+                }
+
+                function stackIsEmpty() {
+                    return stackSize === 0
+                }
+
+                let expressionLength = 0
+                for (let i = 0; infixExpression[i] !== undefined; i++) {
+                    expressionLength++
+                }
+
+                // Add spaces between numbers and operators for proper parsing
+                let spacedExpression = ""
+                for (let index = 0; index < expressionLength; index++) {
+                    const currentCharacter = infixExpression[index]
+                    
+                    if (isAlphanumeric(currentCharacter)) {
+                        spacedExpression += currentCharacter
+                    } else {
+                        // Add spaces around operators and parentheses
+                        if (spacedExpression.length > 0 && spacedExpression[spacedExpression.length - 1] !== " ") {
+                            spacedExpression += " "
+                        }
+                        spacedExpression += currentCharacter
+                        if (index < expressionLength - 1) {
+                            spacedExpression += " "
+                        }
+                    }
+                }
+
+                // Now process the spaced expression
+                const tokens = spacedExpression.split(' ').filter(token => token !== '')
+                
+                for (let i = 0; i < tokens.length; i++) {
+                    const token = tokens[i]
+                    
+                    if (isAlphanumeric(token[0]) || (token.length > 1 && token[0] === '-' && isDigit(token[1]))) {
+                        // It's a number (including negative numbers)
+                        resultExpression += (resultExpression ? " " : "") + token
+                    } else if (token === "(") {
+                        stackPush("(")
+                    } else if (token === ")") {
+                        while (!stackIsEmpty() && stackTop() !== "(") {
+                            resultExpression += " " + stackPop()
+                        }
+                        stackPop() 
+                    } else if (isOperator(token)) {
+                        while (!stackIsEmpty() && stackTop() !== "(" && prec(token) <= prec(stackTop())) {
+                            resultExpression += " " + stackPop()
+                        }
+                        stackPush(token)
+                    }
+                }
+
+                while (!stackIsEmpty()) {
+                    resultExpression += " " + stackPop()
+                }
+
+                return resultExpression.trim()
+            }
+
+            function evaluatePostfix(postfixExpression) {
+                const stack = []
+                const tokens = postfixExpression.split(' ').filter(token => token !== '')
+
+                function isNumeric(str) {
+                    if (str.length === 0) return false
+                    let start = 0
+                    if (str[0] === '-') {
+                        if (str.length === 1) return false
+                        start = 1
+                    }
+                    for (let i = start; i < str.length; i++) {
+                        if (str[i] < '0' || str[i] > '9') {
+                            return false
+                        }
+                    }
+                    return true
+                }
+
+                function toNumber(str) {
+                    return parseInt(str, 10)
+                }
+
+                function power(base, exponent) {
+                    if (exponent === 0) return 1
+                    if (exponent < 0) return 0
+                    let result = 1
+                    for (let i = 0; i < exponent; i++) {
+                        result *= base
+                    }
+                    return result
+                }
+                function integerDivide(a, b) {
+
+                        if (b === 0) return "Error" 
+
+                        let quotient = 0
+
+                        let remainder = absolute(a)
+
+                        const divisor = absolute(b)
+
+                        while (remainder >= divisor) {
+
+                          remainder -= divisor
+
+                          quotient++
+
+                        }
 
 
-    function stackPush(item) {
-      operatorStack += item
-      stackSize++
-    }
+                        if ((a < 0 && b > 0) || (a > 0 && b < 0)) {
 
-    function stackPop() {
-      if (stackSize === 0) return ""
-      const lastItem = operatorStack[stackSize - 1]
-      operatorStack = operatorStack.substring(0, stackSize - 1)
-      stackSize--
-      return lastItem
-    }
+                          quotient = -quotient
 
-    function stackTop() {
-      if (stackSize === 0) return ""
-      return operatorStack[stackSize - 1]
-    }
+                        }
 
-    function stackIsEmpty() {
-      return stackSize === 0
-    }
+                        return quotient
 
-   
-    let expressionLength = 0
-    for (let i = 0; infixExpression[i] !== undefined; i++) {
-      expressionLength++
-    }
+                      }
 
-    for (let index = 0; index < expressionLength; index++) {
-      const currentCharacter = infixExpression[index]
 
-      if (isAlphanumeric(currentCharacter)) {
-        resultExpression += currentCharacter
-      } else if (currentCharacter === "(") {
-        stackPush("(")
-      } else if (currentCharacter === ")") {
-        while (!stackIsEmpty() && stackTop() !== "(") {
-          resultExpression += stackPop()
-        }
-        stackPop() 
-      } else {
-        while (!stackIsEmpty() && prec(currentCharacter) <= prec(stackTop())) {
-          resultExpression += stackPop()
-        }
-        stackPush(currentCharacter)
-      }
-    }
 
-    while (!stackIsEmpty()) {
-      resultExpression += stackPop()
-    }
+                for (let i = 0; i < tokens.length; i++) {
+                    const token = tokens[i]
 
-    return resultExpression
-  }
-  function updateDisplay() {
-    $("#currentExpression").text(currentExpression || "Enter expression...")
+                    if (isNumeric(token)) {
+                        stack.push(toNumber(token))
+                    } else if (token.length === 1 && isOperator(token)) {
+                        if (stack.length < 2) return "Error"
 
-    $("#inputtext").val(currentExpression)
-  }
-function addChar(char) {
-    if (currentExpression === "" && isOperator(char) && char !== "-") {
-      return 
-    }
+                        const b = stack.pop()
+                        const a = stack.pop()
+                        let result = 0
 
-    if (isOperator(char)) {
-      
-      if (currentExpression.length > 0 && isOperator(currentExpression[currentExpression.length - 1])) {
-        if (char === lastaddCharacter) {
+                        if (token === '+') {
+                            result = a + b
+                        } else if (token === '-') {
+                            result = a - b
+                        } else if (token === '*') {
+                            result = a * b
+                        } else if (token === '/') {
+                            if (b === 0) return "Error"
 
-          return
-        } else {
-          currentExpression = currentExpression.slice(0, -1) 
-        }
-      }
-    }
+                          const divResult = integerDivide(a, b)
+                          if (divResult === "Error") return "Error"
+                          result = divResult
+                        } else if (token === '^') {
+                            result = power(a, b)
+                        } else {
+                            return "Error"
+                        }
 
-    currentExpression += char
-    lastaddCharacter = char
-    updateDisplay()
-  }
-  // input ot dsiplay
-  $("#plus").click(() => addChar("+"))
-  $("#minus").click(() => addChar("-"))
-  $("#multiply").click(() => addChar("*"))
-  $("#divide").click(() => addChar("/"))
-  $("#power").click(() => addChar("^"))
-  $("#openParen").click(() => addChar("("))
-  $("#closeParen").click(() => addChar(")"))
+                        stack.push(result)
+                    } else {
+                        return "Error"
+                    }
+                }
 
-  $("#0").click(() => addChar("0"))
-  $("#1").click(() => addChar("1"))
-  $("#2").click(() => addChar("2"))
-  $("#3").click(() => addChar("3"))
-  $("#4").click(() => addChar("4"))
-  $("#5").click(() => addChar("5"))
-  $("#6").click(() => addChar("6"))
-  $("#7").click(() => addChar("7"))
-  $("#8").click(() => addChar("8"))
-  $("#9").click(() => addChar("9"))
+                if (stack.length !== 1) return "Error"
+                return stack[0]
+            }
 
-  $("#Clear").click(() => {
-    currentExpression = ""
-    updateDisplay()
-    $("#postfixResult").text("")
-    $("#postfixconversion").val("")
-    $("#total").val("")
-  })
-  $("#toggleSign").click(() => {
-    toggleSign()
-  })
+            function updateDisplay() {
+                $("#inputtext").val(currentExpression)
+            }
+                      function handleNegativeExpressions(expression) {
+                    let result = "";
+                    let i = 0;
+                    const length = expression.length;
+                    
+                    // Helper function to check if a character is an operator
+                    function isOp(char) {
+                        return char === '+' || char === '-' || char === '*' || char === '/' || char === '^';
+                    }
+                    
+                    // Helper function to check if a character is a digit
+                    function isDigit(char) {
+                        return char >= "0" && char <= "9";
+                    }
+                    
+                    while (i < length) {
+                        const currentChar = expression[i];
+                        
+                        // Check if this is a negative sign (not a subtraction)
+                        if (currentChar === '-' && 
+                            (i === 0 || expression[i-1] === '(' || isOp(expression[i-1]))) {
+                            
+                            // This is a negative sign, not subtraction
+                            result += '-';
+                            i++;
+                            
+                            // Handle the number after the negative sign
+                            while (i < length && isDigit(expression[i])) {
+                                result += expression[i];
+                                i++;
+                            }
+                        } else {
+                            // Regular character, just add it
+                            result += currentChar;
+                            i++;
+                        }
+                    }
+                    
+                    return result;
+                }
 
-  $("#convert").click(() => {
-    const result = infixToPostfix(currentExpression)
-    $("#postfixResult").text(result)
-    $("#postfixconversion").val(result)
-  })
 
-  $(document).keydown((event) => {
-    const key = event.key
+            function addChar(char) {
+                if (currentExpression === "" && isOperator(char) && char !== "-") {
+                    return 
+                }
 
-    if (key >= "0" && key <= "9") {
-      addChar(key)
-      event.preventDefault()
-    } else if (key === "+") {
-      addChar("+")
-      event.preventDefault()
-    } else if (key === "-") {
-      addChar("-")
-      event.preventDefault()
-    } else if (key === "*") {
-      addChar("*")
-      event.preventDefault()
-    } else if (key === "/") {
-      addChar("/")
-      event.preventDefault()
-    } else if (key === "^") {
-      addChar("^")
-      event.preventDefault()
-    } else if (key === "(") {
-      addChar("(")
-      event.preventDefault()
-    } else if (key === ")") {
-      addChar(")")
-      event.preventDefault()
-    } else if (key === "Enter") {
-      const result = infixToPostfix(currentExpression)
-      $("#postfixResult").text(result)
-      $("#postfixconversion").val(result)
-      event.preventDefault()
-    } else if (key === "Escape" || key === "Delete") {
-      currentExpression = ""
-      updateDisplay()
-      $("#postfixResult").text("")
-      $("#postfixconversion").val("")
-      $("#total").val("")
-      event.preventDefault()
-    } else if (key === "Backspace") {
-      let newExpression = ""
-      let expressionLength = 0
+                if (isOperator(char)) {
+                    if (currentExpression.length > 0 && isOperator(currentExpression[currentExpression.length - 1])) {
+                        if (char === lastaddCharacter) {
+                            return
+                        } else {
+                            currentExpression = currentExpression.slice(0, -1) 
+                        }
+                    }
+                }
 
-     
-      for (let i = 0; currentExpression[i] !== undefined; i++) {
-        expressionLength++
-      }
+                currentExpression += char
+                lastaddCharacter = char
+                updateDisplay()
+            }
 
-      for (let i = 0; i < expressionLength - 1; i++) {
-        newExpression += currentExpression[i]
-      }
+            // Button event handlers
+            $("#plus").click(() => addChar("+"))
+            $("#minus").click(() => addChar("-"))
+            $("#multiply").click(() => addChar("*"))
+            $("#divide").click(() => addChar("/"))
+            $("#power").click(() => addChar("^"))
+            $("#openParen").click(() => addChar("("))
+            $("#closeParen").click(() => addChar(")"))
 
-      currentExpression = newExpression
-      updateDisplay()
-      event.preventDefault()
-    }
+            $("#0").click(() => addChar("0"))
+            $("#1").click(() => addChar("1"))
+            $("#2").click(() => addChar("2"))
+            $("#3").click(() => addChar("3"))
+            $("#4").click(() => addChar("4"))
+            $("#5").click(() => addChar("5"))
+            $("#6").click(() => addChar("6"))
+            $("#7").click(() => addChar("7"))
+            $("#8").click(() => addChar("8"))
+            $("#9").click(() => addChar("9"))
 
-  })
-})
+            $("#Clear").click(() => {
+                currentExpression = ""
+                updateDisplay()
+                $("#postfixconversion").val("")
+                $("#total").val("")
+            })
+
+            $("#toggleSign").click(() => {
+                toggleSign()
+            })
+
+            $("#convert").click(() => {
+                if (currentExpression === "") {
+                    $("#postfixconversion").val("Enter an expression first")
+                    $("#total").val("")
+                    return
+                }
+
+                const result = infixToPostfix(currentExpression)
+                $("#postfixconversion").val(result)
+
+                const total = evaluatePostfix(result)
+                $("#total").val(total)
+            })
+
+            // Keyboard support
+            $(document).keydown((event) => {
+                const key = event.key
+
+                if (key >= "0" && key <= "9") {
+                    addChar(key)
+                    event.preventDefault()
+                } else if (key === "+") {
+                    addChar("+")
+                    event.preventDefault()
+                } else if (key === "-") {
+                    addChar("-")
+                    event.preventDefault()
+                } else if (key === "*") {
+                    addChar("*")
+                    event.preventDefault()
+                } else if (key === "/") {
+                    addChar("/")
+                    event.preventDefault()
+                } else if (key === "^") {
+                    addChar("^")
+                    event.preventDefault()
+                } else if (key === "(") {
+                    addChar("(")
+                    event.preventDefault()
+                } else if (key === ")") {
+                    addChar(")")
+                    event.preventDefault()
+                } else if (key === "Enter") {
+                    $("#convert").click()
+                    event.preventDefault()
+                } else if (key === "Escape" || key === "Delete") {
+                    $("#Clear").click()
+                    event.preventDefault()
+                } else if (key === "Backspace") {
+                    if (currentExpression.length > 0) {
+                        currentExpression = currentExpression.slice(0, -1)
+                        updateDisplay()
+                    }
+                    event.preventDefault()
+                }
+            })
+
+
+            updateDisplay()
+        })
